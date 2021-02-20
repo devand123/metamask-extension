@@ -26,6 +26,7 @@ async function addEthereumChainHandler(
     findCustomRpcBy,
     updateRpcTarget,
     requestUserApproval,
+    sendMetrics,
   },
 ) {
   if (!req.params?.[0] || typeof req.params[0] !== 'object') {
@@ -226,6 +227,21 @@ async function addEthereumChainHandler(
         },
       }),
     );
+
+    sendMetrics({
+      event: 'Custom Network Added',
+      category: 'network',
+      referrer: {
+        url: origin,
+      },
+      sensitiveProperties: {
+        chain_id: _chainId,
+        rpc_url: firstValidRPCUrl,
+        network_name: _chainName,
+        native_currency: ticker,
+        block_explorer_url: firstValidBlockExplorerUrl,
+      },
+    });
 
     await updateRpcTarget(
       await requestUserApproval({
